@@ -23,6 +23,11 @@ const iziError = {
     maxWidth: '432px',
 
 }
+
+const iziInfo = {
+    message: "We're sorry, but you've reached the end of search results.",
+    position: 'topRight',
+}
  let lightbox = new SimpleLightbox('.gallery a', {
     captionsData: "alt",
     captionDelay: 250,
@@ -33,39 +38,64 @@ const form = document.querySelector('.js-search-form');
 const input = document.querySelector('.js-search-input');
 const gallery = document.querySelector('.js-gallery');
 const loader = document.querySelector('.js-loader');
+const loadMoreBtn = document.querySelector('.js-load-more');
+let searchQuery = null;
+let currentPage = 1;
+
+
+
+
+const resetLoadMore = () => {
+    loadMoreBtn.classList.add('is-hidden');
+    loadMoreBtn.removeEventListener('click', onLoadMoreClick);
+}
 
 const onFormSubmit = async (event) => {
-    event.preventDefault();
-
-    const searchQuery = input.value.trim();
-    
-    if (searchQuery === '') {
-        iziToast.error(iziError);
-        gallery.innerHTML = '';
-        
-        event.target.reset();
-        return;
-    }
-
-    gallery.innerHTML = '';
-    
-
     try {
+        event.preventDefault();
+
+        searchQuery = input.value.trim();
+        currentPage = 1;
+            if (searchQuery === '') {
+                iziToast.error(iziError);
+                gallery.innerHTML = '';
+                resetLoadMore();
+                event.target.reset();
+                return;
+            }
+           
+
+        gallery.innerHTML = '';
 
         loader.classList.add('is-visible');
 
-        const { data } = await fetchPhotos(searchQuery);
+        const { data } = await fetchPhotos(searchQuery, currentPage);
+        const photosPerPage = 15;
+        const totalPages = Math.ceil(data.totalHits / photosPerPage);
 
         loader.classList.remove('is-visible');
 
-        if (data.hits.length === 0) {
-            iziToast.error(iziError);
-            gallery.innerHTML = '';
+            if (data.hits.length === 0) {
+                iziToast.error(iziError);
+                gallery.innerHTML = '';
         
-            event.target.reset();
-            return;
-      }
+                event.target.reset();
+                resetLoadMore();
+                return;
+            }
+        
+            if (totalPages === 1) {
+                resetLoadMore();
+                gallery.innerHTML = renderPhotos(data.hits);
+                event.target.reset();
+                return;
+            }
+        
         gallery.innerHTML = renderPhotos(data.hits);
+
+        loadMoreBtn.classList.remove('is-hidden');
+        loadMoreBtn.addEventListener('click', onLoadMoreClick);
+
         
 
     } catch (error) {
@@ -73,6 +103,43 @@ const onFormSubmit = async (event) => {
     }
 
     event.target.reset();
+}
+
+const onLoadMoreClick = async (event) => {
+    try {
+        currentPage++;
+        loader.classList.add('is-visible');
+        const { data } = await fetchPhotos(searchQuery, currentPage);
+        const photosPerPage = 15;
+        const totalPages = Math.ceil(data.totalHits / photosPerPage);
+        loader.classList.remove('is-visible');
+        gallery.insertAdjacentHTML('beforeend', renderPhotos(data.hits))
+
+
+         const galleryItem = document.querySelector('.js-gallery-item');
+            let rect = galleryItem.getBoundingClientRect();
+            console.log(rect.height);
+       
+        
+        window.scrollBy({
+            top: rect.height * 2,
+            behavior: 'smooth'
+        });
+   
+
+            if (currentPage === totalPages) {
+                resetLoadMore();
+                iziToast.info(iziInfo);
+            }
+        
+        window.scrollBy({
+            top: galleryCardHeight * 2,
+            behavior: 'smooth'
+        });
+    } catch (error) {
+        console.log(error);
+    }
+    
 }
 
 

@@ -1,7 +1,7 @@
 export  const renderPhotos = pictures => {
       return pictures.map(picture =>
           `
- <li class="gallery-item">
+ <li class="gallery-item js-gallery-item">
   <a class="gallery-link" href="${picture.largeImageURL}">
   <div class="image-wrapper">
     <img
