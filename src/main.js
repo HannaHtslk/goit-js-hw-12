@@ -1,7 +1,6 @@
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
-import axios from "axios";
 
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
@@ -24,6 +23,10 @@ const iziError = {
     maxWidth: '432px',
 
 }
+ let lightbox = new SimpleLightbox('.gallery a', {
+    captionsData: "alt",
+    captionDelay: 250,
+ });
 
 
 const form = document.querySelector('.js-search-form');
@@ -31,7 +34,7 @@ const input = document.querySelector('.js-search-input');
 const gallery = document.querySelector('.js-gallery');
 const loader = document.querySelector('.js-loader');
 
-const onFormSubmit = event => {
+const onFormSubmit = async (event) => {
     event.preventDefault();
 
     const searchQuery = input.value.trim();
@@ -45,36 +48,35 @@ const onFormSubmit = event => {
     }
 
     gallery.innerHTML = '';
-    loader.classList.add('is-visible');
+    
 
+    try {
 
-    fetchPhotos(searchQuery)
-        .finally(() => {
-            loader.classList.remove('is-visible');
-        })
-        .then((photos) => {
-            if (photos.hits.length === 0) {
-                iziToast.error(iziError);
+        loader.classList.add('is-visible');
+
+        const { data } = await fetchPhotos(searchQuery);
+
+        loader.classList.remove('is-visible');
+
+        if (data.hits.length === 0) {
+            iziToast.error(iziError);
             gallery.innerHTML = '';
         
             event.target.reset();
             return;
-            }
-        gallery.innerHTML = renderPhotos(photos.hits);
-            
-    let lightbox = new SimpleLightbox('.gallery a', {
-    captionsData: "alt",
-    captionDelay: 250,
-    });
-    lightbox.refresh();
-    
-     })
-        .catch((error) => {
-            console.log(error)
-        })
+      }
+        gallery.innerHTML = renderPhotos(data.hits);
+        
 
-         event.target.reset();
+    } catch (error) {
+        console.log(error);
+    }
+
+    event.target.reset();
 }
 
 
 form.addEventListener('submit', onFormSubmit);
+
+
+    
