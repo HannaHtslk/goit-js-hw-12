@@ -134,7 +134,7 @@ const onLoadMoreClick = async (event) => {
         
         window.scrollBy({
             top: galleryCardHeight * 2,
-            behavior: 'smooth'
+            behavior: 'smooth',
         });
     } catch (error) {
         console.log(error);
