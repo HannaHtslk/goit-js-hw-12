@@ -39,7 +39,10 @@ const loadMoreBtn = document.querySelector('.js-load-more');
 let searchQuery = null;
 let currentPage = 1;
 
-
+let lightbox = new SimpleLightbox('.gallery a', {
+    captionsData: "alt",
+    captionDelay: 250,
+        }); 
 
 
 const resetLoadMore = () => {
@@ -69,7 +72,7 @@ const onFormSubmit = async (event) => {
 
         const { data } = await fetchPhotos(searchQuery, currentPage);
       
-
+           
         loader.classList.remove('is-visible');
 
         if (data.hits.length === 0) {
@@ -94,11 +97,14 @@ const onFormSubmit = async (event) => {
         
         gallery.innerHTML = renderPhotos(data.hits);
 
+
+        
+        
         loadMoreBtn.classList.remove('is-hidden');
         loadMoreBtn.addEventListener('click', onLoadMoreClick);
 
         
-
+        lightbox.refresh();
     } catch (error) {
         loader.classList.remove('is-visible');
         console.log(error);
@@ -145,8 +151,5 @@ const onLoadMoreClick = async (event) => {
 
 form.addEventListener('submit', onFormSubmit);
 
- let lightbox = new SimpleLightbox('.gallery a', {
-    captionsData: "alt",
-    captionDelay: 250,
- });
+
     
