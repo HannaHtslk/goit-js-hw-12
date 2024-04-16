@@ -28,16 +28,13 @@ const iziInfo = {
     message: "We're sorry, but you've reached the end of search results.",
     position: 'topRight',
 }
- let lightbox = new SimpleLightbox('.gallery a', {
-    captionsData: "alt",
-    captionDelay: 250,
- });
+
 
 
 const form = document.querySelector('.js-search-form');
-const input = document.querySelector('.js-search-input');
 const gallery = document.querySelector('.js-gallery');
 const loader = document.querySelector('.js-loader');
+const input = document.querySelector('.js-search-input');
 const loadMoreBtn = document.querySelector('.js-load-more');
 let searchQuery = null;
 let currentPage = 1;
@@ -56,6 +53,7 @@ const onFormSubmit = async (event) => {
 
         searchQuery = input.value.trim();
         currentPage = 1;
+
             if (searchQuery === '') {
                 iziToast.error(iziError);
                 gallery.innerHTML = '';
@@ -70,19 +68,22 @@ const onFormSubmit = async (event) => {
         loader.classList.add('is-visible');
 
         const { data } = await fetchPhotos(searchQuery, currentPage);
-        const photosPerPage = 15;
-        const totalPages = Math.ceil(data.totalHits / photosPerPage);
+      
 
         loader.classList.remove('is-visible');
 
-            if (data.hits.length === 0) {
-                iziToast.error(iziError);
-                gallery.innerHTML = '';
-        
-                event.target.reset();
-                resetLoadMore();
-                return;
+        if (data.hits.length === 0) {
+            gallery.innerHTML = '';
+            
+            event.target.reset();
+            
+            iziToast.error(iziError);
+            resetLoadMore();
+
+            return;
             }
+            
+        const totalPages = Math.ceil(data.totalHits / data.per_page);
         
             if (totalPages === 1) {
                 resetLoadMore();
@@ -99,6 +100,7 @@ const onFormSubmit = async (event) => {
         
 
     } catch (error) {
+        loader.classList.remove('is-visible');
         console.log(error);
     }
 
@@ -108,27 +110,26 @@ const onFormSubmit = async (event) => {
 const onLoadMoreClick = async (event) => {
     try {
         currentPage++;
+
         loader.classList.add('is-visible');
+   
         const { data } = await fetchPhotos(searchQuery, currentPage);
-        const photosPerPage = 15;
-        const totalPages = Math.ceil(data.totalHits / photosPerPage);
+
+        
         loader.classList.remove('is-visible');
         gallery.insertAdjacentHTML('beforeend', renderPhotos(data.hits))
 
 
         const galleryItem = document.querySelector('.js-gallery-item');
         let rect = galleryItem.getBoundingClientRect();
-        console.log(rect)
-           
-
-        
+        // console.log(rect)
         window.scrollBy({
             top: rect.height * 2,
             behavior: 'smooth',
         });
-        console.log(rect.height);
+        // console.log(rect.height);
    
-
+        const totalPages = Math.ceil(data.totalHits / data.per_page);
             if (currentPage === totalPages) {
                 resetLoadMore();
                 iziToast.info(iziInfo);
@@ -144,5 +145,8 @@ const onLoadMoreClick = async (event) => {
 
 form.addEventListener('submit', onFormSubmit);
 
-
+ let lightbox = new SimpleLightbox('.gallery a', {
+    captionsData: "alt",
+    captionDelay: 250,
+ });
     
