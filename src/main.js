@@ -53,7 +53,8 @@ const resetLoadMore = () => {
 const onFormSubmit = async (event) => {
     try {
         event.preventDefault();
-
+        loadMoreBtn.classList.add('is-hidden');
+        
         searchQuery = input.value.trim();
         currentPage = 1;
 
@@ -73,15 +74,19 @@ const onFormSubmit = async (event) => {
         const { data } = await fetchPhotos(searchQuery, currentPage);
       
            
+
+        
         loader.classList.remove('is-visible');
 
+
         if (data.hits.length === 0) {
+            resetLoadMore();
             gallery.innerHTML = '';
             
             event.target.reset();
             
             iziToast.error(iziError);
-            resetLoadMore();
+            
 
             return;
             }
@@ -106,6 +111,7 @@ const onFormSubmit = async (event) => {
         
         lightbox.refresh();
     } catch (error) {
+        
         loader.classList.remove('is-visible');
         console.log(error);
     }
@@ -116,6 +122,7 @@ const onFormSubmit = async (event) => {
 const onLoadMoreClick = async (event) => {
     try {
         currentPage++;
+     
 
         loader.classList.add('is-visible');
    
@@ -139,6 +146,8 @@ const onLoadMoreClick = async (event) => {
             if (currentPage === totalPages) {
                 resetLoadMore();
                 iziToast.info(iziInfo);
+            } else {
+                loadMoreBtn.classList.remove('is-hidden');
             }
         
 
