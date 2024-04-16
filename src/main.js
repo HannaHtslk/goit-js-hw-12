@@ -24,6 +24,20 @@ const iziError = {
 
 }
 
+
+const iziEmpty = {
+  titleColor: 'rgba(255, 255, 255, 1)',
+  titleSize: '16px',
+  message: 'Input must not be empty!',
+  messageColor: 'rgba(255, 255, 255, 1)',
+  background: '#EF4040',
+  iconUrl: iconError,
+  position: 'topRight',
+    progressBarColor: 'rgba(181, 27, 27, 1)',
+    maxWidth: '432px',
+
+}
+
 const iziInfo = {
     message: "We're sorry, but you've reached the end of search results.",
     position: 'topRight',
@@ -59,7 +73,7 @@ const onFormSubmit = async (event) => {
         currentPage = 1;
 
             if (searchQuery === '') {
-                iziToast.error(iziError);
+                iziToast.error(iziEmpty);
                 gallery.innerHTML = '';
                 resetLoadMore();
                 event.target.reset();
