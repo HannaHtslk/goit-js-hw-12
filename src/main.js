@@ -146,10 +146,7 @@ const onLoadMoreClick = async (event) => {
             if (currentPage === totalPages) {
                 resetLoadMore();
                 iziToast.info(iziInfo);
-            } else {
-                loadMoreBtn.classList.remove('is-hidden');
             }
-        
 
     } catch (error) {
         console.log(error);
