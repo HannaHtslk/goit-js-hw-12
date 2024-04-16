@@ -116,15 +116,17 @@ const onLoadMoreClick = async (event) => {
         gallery.insertAdjacentHTML('beforeend', renderPhotos(data.hits))
 
 
-         const galleryItem = document.querySelector('.js-gallery-item');
-            let rect = galleryItem.getBoundingClientRect();
-            console.log(rect.height);
-       
+        const galleryItem = document.querySelector('.js-gallery-item');
+        let rect = galleryItem.getBoundingClientRect();
+        console.log(rect)
+           
+
         
         window.scrollBy({
             top: rect.height * 2,
-            behavior: 'smooth'
+            behavior: 'smooth',
         });
+        console.log(rect.height);
    
 
             if (currentPage === totalPages) {
@@ -132,10 +134,7 @@ const onLoadMoreClick = async (event) => {
                 iziToast.info(iziInfo);
             }
         
-        window.scrollBy({
-            top: galleryCardHeight * 2,
-            behavior: 'smooth',
-        });
+
     } catch (error) {
         console.log(error);
     }
